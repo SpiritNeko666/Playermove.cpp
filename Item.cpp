@@ -1,11 +1,25 @@
 #include "Item.h"
+#include <iostream>
 
-    Item::Item(string id = "*", string name = "empty space"){
-    this->id = "id";
-    this->name "name";
+Item::Item(char id, std::string name) {
+    this->id = id;
+    this->name = name;
+}
+
+char Item::getId() {
+    return this->id;
+}
+
+std::string Item::getName() {
+    return this->name;
+}
+
+std::string Item::getNameFromId(char id) {
+    if(id == 'k') {
+        return "key";
+    } if(id == 'p') {
+        return "potion";
+    } else {
+        return "N/A";
     }
-        
-    string getId();
-    string getName();
-    void setId();
-    void setName();
+}

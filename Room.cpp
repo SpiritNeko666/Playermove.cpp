@@ -1,57 +1,82 @@
 #include "Room.h"
 #include "Player.h"
+#include "Item.h"
+
 #include <iostream>
+#include <cstdlib>
+
 using namespace std;
 
-Room::Room(int x, int y, Player*player){
+
+Room::Room(int x, int y, Player * player) {
+
     this->player = player;
+
     this->width = x;
     this->height = y;
 
     this->map = new char*[y];
 
-
-
-
-    for(int outerCounter = 0; outerCounter < y; outerCounter++){
+    for(int outerCounter = 0; outerCounter < y; outerCounter++) {
         this->map[outerCounter] = new char[x];
-        for(int innerCounter = 0; innerCounter < x; innerCounter++){
-            if(outerCounter == 0 || outerCounter == (y-1) || innerCounter == 0 || innerCounter == (x-1)){
+        for(int innerCounter = 0; innerCounter < x; innerCounter++) {
+            if(outerCounter == 0 || outerCounter == (y - 1) || innerCounter == 0 || innerCounter == (x - 1)) {
                 this->map[outerCounter][innerCounter] = '#';
-            }else{
+            } else if(rand() % 8 == 0 && outerCounter > 1 && outerCounter < (y - 2) && innerCounter > 1 && innerCounter < (x - 2)) {
+                // about one inside space in eight is a wall, but never right next to the outer wall,
+                // so the player can always walk around the edge (and starts on an open space)
+                this->map[outerCounter][innerCounter] = '#';
+            } else {
                 this->map[outerCounter][innerCounter] = ' ';
             }
-
+            
         }
     }
+
+
+
+
+ 
 }
-bool Room::canMove(int x, int y){
-    if(map[y][x] != '#'){
+Room::~Room() {
+    // release each row, then the array of rows
+    for(int outerCounter = 0; outerCounter < height; outerCounter++) {
+        delete[] this->map[outerCounter];
+    }
+    delete[] this->map;
+}
+
+bool Room::canMove(int x, int y) {
+    if(map[y][x] != '#') {
         return true;
-    }else{
+    } else {
         return false;
     }
-
-
 }
 
-void Room::draw(){
-
-    for(int outerCounter = 0; outerCounter < height; outerCounter++){
-        for(int innerCounter = 0; innerCounter < width; innerCounter++){
-            if(player->getx() == innerCounter && this->player->gety()== outerCounter){
-            cout << "@";
-            }else{
-            cout << this->map[outerCounter][innerCounter];
-            }        
+void Room::draw() {
+    for(int outerCounter = 0; outerCounter < height; outerCounter++) {
+        for(int innerCounter = 0; innerCounter < width; innerCounter++) { // check if the player is on this spot
+            if(this->player->getX() == innerCounter && this->player->getY() == outerCounter) {
+                cout << '@';
+            } else {
+                cout << this->map[outerCounter][innerCounter];
+            }
+        }
+        cout << endl;
     }
-
-
-    cout << endl;
 }
 
+void Room::placeItem(Item * i, int x, int y) {
+    this->map[y][x] = i->getId();
 }
 
-Room::~Room(){
+Item Room::takeItem(int x, int y) {
+    Item newItem(this->map[y][x], Item::getNameFromId(this->map[y][x]));
+    this->map[y][x] = ' ';
+    return newItem;
+}
 
+char Room::tileAt(int x, int y) {
+    return this->map[y][x];
 }

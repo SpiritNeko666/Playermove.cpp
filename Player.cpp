@@ -1,60 +1,81 @@
-#include "Room.h"
 #include "Player.h"
-#include <iostream>
+#include "Room.h"
+#include "Item.h"
+#include "Inventory.h"
 
-using namespace std;
-
-Player::Player(){
-    this->x = 3;
-    this->y = 3;
+Player::Player() {
+    // the top-left open space, which every map has
+    this->x = 1;
+    this->y = 1;
+}
+Player::~Player() {
+    // leave this empty since player currently doesn't allocate any memory that it needs to clean up.
 }
 
-Player::~Player(){
-
-
+int Player::getX() {
+    return this->x;
+}
+int Player::getY() {
+    return this->y;
 }
 
-int Player::getx(){
-    return x;
-}
-int Player::gety(){
-    return y;
-}
-
-bool Player::move(char direction, Room*room){
-
-    if(direction == 'w'){
-        //(*room).canMove(this->x, this->y -1);
-       if( room->canMove(this->x, this->y-1)){
-        this->y -= 1;
-        return true;
-       }
 
 
+// return true if they player moved or false if not
+// TODO: After a move, it takes anything lying on its new space and adds it to the inventory.
+bool Player::move(char direction, Room * room) {
+
+
+    // take in a direction, check which direciton it is, check if the player can move there in the room
+    // then if they can, change the player x and y.
+
+    if(direction == 'w') {
+        // (*room).canMove(this->x, this->y - 1);
+        if(room->canMove(this->x, this->y - 1)) {
+            this->y -= 1;
+            if(room->tileAt(this->x, this->y) != ' ') {
+                this->getItem(room, this->x, this->y);
+            }
+            return true;
+        }
+        // check if there is anything blocking us at the position we WOULD go to if we moved in that direction.
     } else if(direction == 'a') {
-        if( room->canMove(this->x-1, this->y)){
-        this->x -= 1;
-        return true;
-    }
-
-
-    } else if(direction == 's') {
-        if( room->canMove(this->x, this->y+1)){
-        this->y += 1;
-        return true;
-    }
-
-
-    
+        if(room->canMove(this->x - 1, this->y)) {
+            this->x -= 1;
+            if(room->tileAt(this->x, this->y) != ' ') {
+                this->getItem(room, this->x, this->y);
+            }
+            return true;
+        }
     } else if(direction == 'd') {
-        if( room->canMove(this->x+1, this->y)){
-        this->x += 1;
-        return true;
+        if(room->canMove(this->x + 1, this->y)) {
+            this->x += 1;
+            if(room->tileAt(this->x, this->y) != ' ') {
+                this->getItem(room, this->x, this->y);
+            }
+            return true;
+        }
+    } else if(direction == 's') {
+        if(room->canMove(this->x, this->y + 1)) {
+            this->y += 1;
+            if(room->tileAt(this->x, this->y) != ' ') {
+                this->getItem(room, this->x, this->y);
+            }
+            return true;
+        }
     }
 
 
 
-    }
-    return false;
+    return false; // either an invalid direction or can't move there
+}
 
+void Player::getItem(Room * r, int x, int y) {
+    Item itemFromMap = r->takeItem(x, y);
+    Item * item = new Item(itemFromMap.getId(), itemFromMap.getName());
+    this->inventory.addItem(item);
+}
+
+void Player::printInventory() {
+    return inventory.printInventory();
 }

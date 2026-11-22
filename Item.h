@@ -1,17 +1,17 @@
 #include <iostream>
 
-using namepsace std;
+#ifndef ITEM_H
+#define ITEM_H
 
 class Item {
-    private: 
-        string id;
-        string name;
-
-
+    private:
+        char id;
+        std::string name;
     public:
-        Item(string id = "*", string name = "empty space");
-        string getId();
-        string getName();
-        void setId(string id);
-        void setName(string name);
+        static std::string getNameFromId(char id);
+        Item(char id, std::string name);
+        char getId();
+        std::string getName();
 };
+
+#endif
